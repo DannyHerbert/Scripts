@@ -1,19 +1,24 @@
-#TODO: pass path on command line to skip pop up for directory
 
 import os
-import tkinter as tk
+import tkinter
 from tkinter import filedialog
-import subprocess
 import zipfile
+import sys
 from tqdm import tqdm
 
-exclusionType = ("7ZIP", "ZIP")
-
-rooot = tk.Tk()
+rooot = tkinter.Tk()
 rooot.withdraw()
 
-CurrentDir = filedialog.askdirectory()
+CurrentDir = ''
+if (len(sys.argv) <= 1):
+    CurrentDir = filedialog.askdirectory()
+else:
+    CurrentDir = sys.argv[1];
+    CurrentDir = CurrentDir.replace(os.sep, '/')
+    CurrentDir = CurrentDir[:-1]
 
+
+print(CurrentDir)
 for root, dirs, files in os.walk(CurrentDir):
     for dir in dirs:
         path = os.path.join(CurrentDir, dir)
