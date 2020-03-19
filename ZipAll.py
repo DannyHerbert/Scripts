@@ -4,6 +4,7 @@ import tkinter
 from tkinter import filedialog
 import zipfile
 import sys
+import subprocess
 from tqdm import tqdm
 
 rooot = tkinter.Tk()
@@ -31,3 +32,7 @@ for root, dirs, files in os.walk(CurrentDir):
                 zipper.write(os.path.join(path, subfile), subfile)
         zipper.close()
     break
+
+path = os.path.realpath(CurrentDir)
+os.startfile(path)
+

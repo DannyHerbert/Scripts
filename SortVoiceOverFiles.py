@@ -43,5 +43,7 @@ for root, dirs, files in os.walk(CurrentDir):
 dateFormated = datetime.datetime.now().strftime(" %d%m%Y")
 os.rename(CurrentDir, CurrentDir + initials + dateFormated )
 CurrentDir = CurrentDir + initials + dateFormated
-subprocess.Popen(['explorer', CurrentDir])
+
+path = os.path.realpath(CurrentDir)
+os.startfile(path)
 
