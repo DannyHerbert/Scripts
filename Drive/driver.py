@@ -2,12 +2,14 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import os
 
+SEARCH = "Nicola Van Dyke"
+PATH = os.path.normpath(r"G:\My Drive\VOICE OVER\Sessions\Nicola Van Dyke\Session 20052020")
+
+gauth = GoogleAuth()
+gauth.LocalWebserverAuth()
+drive = GoogleDrive(gauth)
 
 def main():
-    gauth = GoogleAuth()
-    gauth.LocalWebserverAuth()
-    drive = GoogleDrive(gauth)
-    SEARCH = "Nicola Van Dyke"
 
     #List out all files
     fileList = drive.ListFile({'q': "'1-EczUSGU3lpjaSYhaoTj9Q3yfETJ0NXx' in parents and trashed=false"}).GetList()
@@ -18,13 +20,23 @@ def main():
         if file['title'] == SEARCH:
             clientID = file['id']
 
-    getfileidfrompath(os.getcwd())
+    getfileidfrompath(PATH)
 
 
-def getfileidfrompath(filepath):
-    path = os.path.normpath(filepath)
-    path.split(os.sep)
-    print (path)
+def getfileidfrompath(filePath):
+    pathList = filePath.split(os.sep)
+    pathList.pop(0)
+    pathList.pop(0)
+    print(pathList)
+
+    fileID = 'root'
+    for dirName in pathList:
+        fileList = drive.ListFile({'q': "'{}' in parents and trashed=false".format(fileID)}).GetList()
+        for file in fileList:
+            if file['title'] == dirName:
+                fileID = file['id']
+
+    print(fileID)
 
 
 main()
