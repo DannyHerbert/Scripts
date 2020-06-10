@@ -4,11 +4,10 @@ client_config:
   client_secret: gYxAdH5RYwIQoSJEJGOF7PjZ
 
 save_credentials: True
-save_credentials_backend: file
+save_credentials_backend: file 
 save_credentials_file: credentials.json
 
-get_refresh_token: True
+get_refresh_token: True 
 
-oauth_scope:
-  - https://www.googleapis.com/auth/drive.file
-  - https://www.googleapis.com/auth/drive.install
+oauth_scope: 
+    - https://www.googleapis.com/auth/drive
