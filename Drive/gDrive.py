@@ -20,6 +20,9 @@ def getFileIDFromPath(filePath, drive):
             if file['title'] == dirName:
                 fileID = file['id']
 
+    if fileID == 'root':
+        raise Exception("the path you provided wasn't on GDrive, fanny")
+
     print("Export folder ID: {}".format(fileID))
     return fileID
 

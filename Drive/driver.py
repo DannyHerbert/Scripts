@@ -1,7 +1,11 @@
 from gDrive import *
 from gMail import *
+import sys
 
-PATH = os.path.normpath(r"G:\My Drive\VOICE OVER\Sessions\Nicola Van Dyke\Session 20052020\Export")
+try:
+    PATH = sys.argv[1]
+except IndexError:
+    raise Exception("You need to provide the path to the files to be sent, fanny")
 
 def main():
     print('Authorising Google Drive...')
