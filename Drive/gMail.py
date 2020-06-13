@@ -4,6 +4,8 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+import webbrowser
+
 from email.mime.text import MIMEText
 import base64
 
@@ -31,6 +33,7 @@ def createDraftEmail(service, name, link):
     message = {'message': createMessage(name, link)}
     draft = service.users().drafts().create(userId=EMAIL, body=message).execute()
     print("Draft id: {}\nDraft message: {}".format(draft['id'], draft['message']))
+    webbrowser.open("https://mail.google.com/mail/u/0/#drafts")
     return draft
 
 def authoriseGmail():

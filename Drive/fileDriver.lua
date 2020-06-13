@@ -2,6 +2,11 @@
 function main()
     setRenderSettings()
     renderPath = getRenderPath()
+
+    renameRegions()
+
+    -- Begin Rendering With Current Settings
+    reaper.Main_OnCommand(41824, 0)
 end
 
 function getRenderPath()
@@ -9,7 +14,46 @@ function getRenderPath()
     nope ,exportName = reaper.GetSetProjectInfo_String(0, "RENDER_FILE", " ", false)
     fullPath = projectPath .. "\\" .. exportName
     print(fullPath)
+    return fullPath 
 end
+
+function setRenderSettings()
+    today = os.date('%d%m%y')
+
+    reaper.GetSetProjectInfo(0, "RENDER_BOUNDSFLAG", 3, true)
+    reaper.GetSetProjectInfo(0, "RENDER_SRATE", 48000, true)
+    reaper.GetSetProjectInfo(0, "RENDER_TAILFLAG", 8, true)
+    reaper.GetSetProjectInfo(0, "RENDER_TAILMS", 1000, true)
+    reaper.GetSetProjectInfo(0, "RENDER_ADDTOPROJ", 0, true)
+    reaper.GetSetProjectInfo(0, "RENDER_SETTINGS", 16, true)
+
+    reaper.GetSetProjectInfo_String(0, "RENDER_FILE", "Export"..today, true)
+    -- TODO: add user input to specify filename/wildflags?
+    reaper.GetSetProjectInfo_String(0, "RENDER_PATTERN", "$project $region $day$month$year2", true)
+    reaper.GetSetProjectInfo_String(0, "RENDER_FORMAT", "ewav", true)
+    reaper.GetSetProjectInfo_String(0, "RENDER_FORMAT2", "l3pm", true)
+end
+
+-- Reanames regions to their id number if they have a default name (from item name or no name) 
+function renameRegions()
+    numRegMark, numMarkers, numRegions = reaper.CountProjectMarkers(0)
+    for id = 1, numRegMark do
+        retval, isRegion, startPosition, endPostiion, name, regIndex = reaper.EnumProjectMarkers(id)
+        if isRegion and (string.match(name, ".wav") or isEmpty(name)) then
+            reaper.SetProjectMarker(regIndex, true, startPosition, endPostiion, regIndex)
+        end
+    end
+end
+
+function print(toPrint)
+    reaper.ShowConsoleMsg(toPrint)
+end
+
+function isEmpty(s)
+  return s == nil or s == ''
+end
+
+main()
 
 -- reaper.GetSetProjectInfo( project, desc, value, is_set )
 --
@@ -38,26 +82,3 @@ end
 -- RENDER_FORMAT2 : base64-encoded secondary sink configuration. Callers can also pass a simple 4-byte string (non-base64-encoded), e.g. "evaw" or "l3pm", to use default settings for that sink type, or "" to disable secondary render.
 --     Formats available on this machine:
 --     "wave" "aiff" "iso " "ddp " "flac" "mp3l" "oggv" "OggS" "FFMP" "GIF " "LCF " "wvpk"
-
-
-function setRenderSettings()
-    today = os.date('%d%m%y')
-
-    reaper.GetSetProjectInfo(0, "RENDER_BOUNDSFLAG", 3, true)
-    reaper.GetSetProjectInfo(0, "RENDER_SRATE", 48000, true)
-    reaper.GetSetProjectInfo(0, "RENDER_TAILFLAG", 8, true)
-    reaper.GetSetProjectInfo(0, "RENDER_TAILMS", 1000, true)
-    reaper.GetSetProjectInfo(0, "RENDER_ADDTOPROJ", 0, true)
-    reaper.GetSetProjectInfo(0, "RENDER_SETTINGS", 16, true)
-
-    reaper.GetSetProjectInfo_String(0, "RENDER_FILE", "Export"..today, true)
-    reaper.GetSetProjectInfo_String(0, "RENDER_PATTERN", "$project $region $day$month$year2", true)
-    reaper.GetSetProjectInfo_String(0, "RENDER_FORMAT", "ewav", true)
-    reaper.GetSetProjectInfo_String(0, "RENDER_FORMAT2", "l3pm", true)
-end
-
-function print(toPrint)
-    reaper.ShowConsoleMsg(toPrint)
-end
-
-main()
