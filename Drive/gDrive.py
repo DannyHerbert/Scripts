@@ -10,6 +10,7 @@ def authoriseGDrive():
 
 def getFileIDFromPath(filePath, drive):
     print("Fetching file ID...")
+
     pathList = filePath.split(os.sep)
     pathList = pathList[2:]
 

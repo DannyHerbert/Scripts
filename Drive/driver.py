@@ -1,4 +1,5 @@
-import gMail 
+import os
+import gMail
 import gDrive
 import sys
 
@@ -8,6 +9,7 @@ except IndexError:
     raise Exception("You need to provide the path to the files to be sent, fanny")
 
 def main():
+    setCWD()
     print('Authorising Google Drive...')
     drive = gDrive.authoriseGDrive()
     print('Authorising Google Mail...')
@@ -20,6 +22,11 @@ def main():
     link = gDrive.getShareableLink(folderToShare)
 
     gMail.createDraftEmail(mail, "danny", link)
+
+def setCWD():
+    absolutePathOfThisScript = os.path.abspath(__file__)
+    directoryName = os.path.dirname(absolutePathOfThisScript)
+    os.chdir(directoryName)
 
 main()
 

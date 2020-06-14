@@ -1,21 +1,23 @@
 
+--TODO: make this a relative path and stick all the python stuff in the same DIR
+DRIVERPATH = ""\"E:\\Dev\\Projects\\Python\\Drive\\driver.py\""
+
 function main()
     setRenderSettings()
-    renderPath = getRenderPath()
-
+    exportPath = getExportPath()
     renameRegions()
 
-    -- Begin Rendering With Current Settings
-    reaper.Main_OnCommand(41824, 0)
+    renderProject()
 
-    os.execute("python \"E:\\Dev\\Projects\\Python\\Drive\\driver.py\" \"".. renderPath.."\"")
+    pythonCommand = "python ".. DRIVERPATH.." \"".. exportPath.."\""
+    os.execute(pythonCommand)
 end
 
-function getRenderPath()
-    projectPath = reaper.GetProjectPathEx( 0, "")
-    nope ,exportName = reaper.GetSetProjectInfo_String(0, "RENDER_FILE", " ", false)
-    fullPath = projectPath .. "\\" .. exportName
-    print(fullPath)
+function getExportPath()
+    _, projectPath = reaper.EnumProjects(-1)
+    projectPath = splitFileName(projectPath)
+    _, exportDirectoryName = reaper.GetSetProjectInfo_String(0, "RENDER_FILE", " ", false)
+    fullPath = projectPath .. exportDirectoryName
     return fullPath 
 end
 
@@ -30,7 +32,7 @@ function setRenderSettings()
     reaper.GetSetProjectInfo(0, "RENDER_SETTINGS", 16, true)
 
     reaper.GetSetProjectInfo_String(0, "RENDER_FILE", "Export"..today, true)
-    -- TODO: add user input to specify filename/wildflags?
+    -- left to use file naming that's specified in the render window
 end
 
 -- Reanames regions to their id number if they have a default name (from item name or no name) 
@@ -50,6 +52,15 @@ end
 
 function isEmpty(s)
   return s == nil or s == ''
+end
+
+function renderProject()
+    reaper.Main_OnCommand(41824, 0)
+end
+
+function splitFileName(path)
+	-- Returns the Path, Filename, and Extension as 3 values
+	return string.match(path, "(.-)([^\\]-([^\\%.]+))$")
 end
 
 main()
