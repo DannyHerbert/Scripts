@@ -1,6 +1,6 @@
 
 --TODO: make this a relative path and stick all the python stuff in the same DIR
-DRIVERPATH = ""\"E:\\Dev\\Projects\\Python\\Drive\\driver.py\""
+DRIVERPATH = "\"E:\\Dev\\Projects\\Python\\Drive\\driver.py\""
 
 function main()
     setRenderSettings()
@@ -8,8 +8,10 @@ function main()
     renameRegions()
 
     renderProject()
+    worked, clientName= reaper.GetUserInputs( "Client Name", 1, "Client Name:", "")
 
-    pythonCommand = "python ".. DRIVERPATH.." \"".. exportPath.."\""
+    pythonCommand = string.format("python %s \"%s\" %s", DRIVERPATH, exportPath, clientName)
+    print(pythonCommand)
     os.execute(pythonCommand)
 end
 

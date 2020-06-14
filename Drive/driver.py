@@ -3,10 +3,18 @@ import gMail
 import gDrive
 import sys
 
+PATH = ""
+NAME = ""
 try:
     PATH = sys.argv[1]
 except IndexError:
     raise Exception("You need to provide the path to the files to be sent, fanny")
+
+try:
+    NAME = sys.argv[2]
+except IndexError:
+    NAME = "NAME"
+    pass
 
 def main():
     setCWD()
@@ -21,7 +29,7 @@ def main():
     gDrive.enableSharing(folderToShare)
     link = gDrive.getShareableLink(folderToShare)
 
-    gMail.createDraftEmail(mail, "danny", link)
+    gMail.createDraftEmail(mail, NAME, link)
 
 def setCWD():
     absolutePathOfThisScript = os.path.abspath(__file__)
