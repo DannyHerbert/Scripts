@@ -7,6 +7,8 @@ function main()
 
     -- Begin Rendering With Current Settings
     reaper.Main_OnCommand(41824, 0)
+
+    os.execute("python \"E:\\Dev\\Projects\\Python\\Drive\\driver.py\" \"".. renderPath.."\"")
 end
 
 function getRenderPath()
@@ -29,9 +31,6 @@ function setRenderSettings()
 
     reaper.GetSetProjectInfo_String(0, "RENDER_FILE", "Export"..today, true)
     -- TODO: add user input to specify filename/wildflags?
-    reaper.GetSetProjectInfo_String(0, "RENDER_PATTERN", "$project $region $day$month$year2", true)
-    reaper.GetSetProjectInfo_String(0, "RENDER_FORMAT", "ewav", true)
-    reaper.GetSetProjectInfo_String(0, "RENDER_FORMAT2", "l3pm", true)
 end
 
 -- Reanames regions to their id number if they have a default name (from item name or no name) 
@@ -56,7 +55,6 @@ end
 main()
 
 -- reaper.GetSetProjectInfo( project, desc, value, is_set )
---
 -- RENDER_SETTINGS : &(1|2)=0:master mix, &1=stems+master mix, &2=stems only, &4=multichannel tracks to multichannel files, &8=use render matrix, &16=tracks with only mono media to mono files, &32=selected media items, &64=selected media items via master
 -- RENDER_BOUNDSFLAG : 0=custom time bounds, 1=entire project, 2=time selection, 3=all project regions, 4=selected media items, 5=selected project regions
 -- RENDER_CHANNELS : number of channels in rendered file
@@ -71,7 +69,6 @@ main()
 -- PROJECT_SRATE_USE : set to 1 if project samplerate is used
     
 -- retval, valuestrNeedBig = reaper.GetSetProjectInfo_String( project, desc, valuestrNeedBig, is_set )
-
 -- MARKER_GUID:X : get the GUID (unique ID) of the marker or region with index X, where X is the index passed to EnumProjectMarkers, not necessarily the displayed number
 -- RECORD_PATH : recording directory -- may be blank or a relative path, to get the effective path see GetProjectPathEx()
 -- RENDER_FILE : render directory

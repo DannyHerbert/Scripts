@@ -1,5 +1,5 @@
-from gDrive import *
-from gMail import *
+import gMail 
+import gDrive
 import sys
 
 try:
@@ -9,17 +9,17 @@ except IndexError:
 
 def main():
     print('Authorising Google Drive...')
-    drive = authoriseGDrive()
+    drive = gDrive.authoriseGDrive()
     print('Authorising Google Mail...')
-    mail = authoriseGmail()
+    mail = gMail.authoriseGmail()
 
-    folderToShare = drive.CreateFile({'id' : getFileIDFromPath(PATH, drive)})
+    folderToShare = drive.CreateFile({'id' : gDrive.getFileIDFromPath(PATH, drive)})
     folderToShare.FetchMetadata()
 
-    enableSharing(folderToShare)
-    link = getShareableLink(folderToShare)
+    gDrive.enableSharing(folderToShare)
+    link = gDrive.getShareableLink(folderToShare)
 
-    createDraftEmail(mail, "danny", link)
+    gMail.createDraftEmail(mail, "danny", link)
 
 main()
 
