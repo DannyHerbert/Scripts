@@ -7,33 +7,53 @@ def main():
     CurrentDir = Helpers.askFileDirectory()
 
     for root, dirs, files in os.walk(CurrentDir):
-        for currentfile in files:
-            print(currentfile)
-            reg = re.search(r"(^[^\.]+)([\._])(.+)(\.\w\w\w)", currentfile)
+        for currentFile in files:
+            print("File Name:  " + currentFile)
+
+            # (first group of characters up that are not a -, _ , or . character. This is the actual name)
+            # (and -, ., or _ character. Thrown away)
+            # (any characters. this is all the 'dup2', '_01' nonsense)
+            # (filetype)
+
+            reg = re.search(r"(^[^.^\-^_?]+)([._-])?(.+)?(\.\w{3})", currentFile)
+
             name = reg.group(1)
+            seperator = reg.group(2)
             rubbish  = reg.group(3)
             filetype = reg.group(4)
+            suffix = ''
 
-            if not rubbish.upper().find('L'):
-                name += ' L'
-            if not rubbish.upper().find('R'):
-                name += ' R'
+            if seperator is None:
+                print("File name is already fine...")
+                print("")
+                continue
 
+            if rubbish is not None:
+                # find any l or r character thats not in a word of word a-z characters
+                panning = re.search(r"(^|[^a-z^A-Z])([lLrR])([^a-z^A-Z]|$)", rubbish)
+                if panning is not None:
+                    suffix += " " + panning.group(2)
 
-            try:
-                os.rename(os.path.join(CurrentDir, currentfile), os.path.join(CurrentDir, name))
-            except FileExistsError:
-                i = 2
-                while True:
-                    rename = name + str(i)
-                    try:
-                        os.rename(os.path.join(CurrentDir, currentfile), os.path.join(CurrentDir, rename))
-                    except FileExistsError:
-                        pass
+            name = os.path.split(renameFileAndIterateForDuplicates(os.path.join(CurrentDir, currentFile),os.path.join(CurrentDir, name + suffix + filetype)))[1]
 
-            name+=filetype
-            print(name)
-            print(rubbish)
-            print(filetype)
+            print("New Name:  " + name)
+            print("Discared:  " + rubbish)
+            print("File type: " + filetype)
+            print(" ")
 
+def renameFileAndIterateForDuplicates(currentPathName, newPathName):
+    multiFileCheck = newPathName[:-4] + " 1" + newPathName[-4:]
+    if(not os.path.isfile(newPathName) and not os.path.isfile(multiFileCheck)):
+        os.rename(currentPathName, newPathName)
+        return newPathName
+    else:
+        if(os.path.isfile(newPathName)):
+            os.rename(newPathName, multiFileCheck)
+        i = 2
+        rename = newPathName[:-4] + " " + str(i) + newPathName[-4:]
+        while os.path.isfile(rename):
+            i += 1
+            rename = newPathName[:-4] + " " + str(i) + newPathName[-4:]
+        os.rename(currentPathName, rename)
+        return rename
 main()
