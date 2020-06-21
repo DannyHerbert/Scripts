@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 import os
 
-def askFileDirectory
+def askFileDirectory():
     rooot = tk.Tk()
     rooot.withdraw()
     CurrentDir = filedialog.askdirectory()
