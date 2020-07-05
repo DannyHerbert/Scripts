@@ -1,13 +1,20 @@
 import re
 import Helpers
 import os
+import tkinter as tk
 
 
 
 def main():
-    CurrentDir = Helpers.askFileDirectory()
+    gui = Gui()
     
-    deleteOtherFiles = Helpers.createCheckBox("Delete Other Files?")
+    print(gui.deleteUnsortableFiles.get())
+    print(gui.keepLeftRight.get())
+    print(gui.currentDirectory.get())
+
+    deleteUnsortableFiles = gui.deleteUnsortableFiles.get()
+    keepLeftRight = gui.keepLeftRight.get()
+    CurrentDir = gui.currentDirectory.get()
 
 
     for root, dirs, files in os.walk(CurrentDir):
@@ -25,7 +32,7 @@ def main():
             try:
                 name = reg.group(1)
             except AttributeError:
-                if deleteOtherFiles:
+                if deleteUnsortableFiles:
                     os.remove(os.path.join(root, currentFile))
                     continue
                 else:
@@ -46,7 +53,7 @@ def main():
                 continue
 
             suffix = ''
-            if rubbish is not None:
+            if rubbish is not None and keepLeftRight:
                 # find any l or r character thats not in a word of word a-z characters
                 panning = re.search(r"(^|[^a-z^A-Z])([lLrR])([^a-z^A-Z]|$)", rubbish)
                 if panning is not None:
@@ -60,6 +67,8 @@ def main():
             print(" ")
 
 def renameFileAndIterateForDuplicates(currentPathName, newPathName):
+    # Bit hard to parse. Goes back to rename first file '1' if there are multiple of the same name
+    # gives "file 1, file 2, file 3" rather than "file, file 2, file 3"
     multiFileCheck = newPathName[:-4] + " 1" + newPathName[-4:]
     if(not os.path.isfile(newPathName) and not os.path.isfile(multiFileCheck)):
         os.rename(currentPathName, newPathName)
@@ -74,4 +83,68 @@ def renameFileAndIterateForDuplicates(currentPathName, newPathName):
             rename = newPathName[:-4] + " " + str(i) + newPathName[-4:]
         os.rename(currentPathName, rename)
         return rename
+
+class Gui:
+    root = None
+    deleteUnsortableFiles = None
+    keepLeftRight = None
+    FileBrowser = None
+
+    def __init__(self):
+        self.root = tk.Tk()
+        self.deleteUnsortableFiles = tk.IntVar()
+        self.keepLeftRight = tk.IntVar()
+        self.currentDirectory = tk.StringVar()
+
+        self.createCheckBox("Delete hidden//unused Files?", self.deleteUnsortableFiles)
+        self.createCheckBox("Keep L and R?", self.keepLeftRight)
+        self.FileBrowser = self.createFileBrowser()
+        self.createButton("Done" , self.onExit)
+
+        self.root.mainloop()
+        self.root.withdraw()
+
+    def createFileBrowser(self):
+        fileBrowser = self.FileBrowser(self.root)
+        return fileBrowser
+
+    def createCheckBox(self, name, var):
+        check = tk.Checkbutton(self.root, text = name, variable = var)
+        check.pack()
+        return check 
+
+    def createButton(self, name, callback):
+        button = tk.Button(self.root, text = name, command = callback)
+        button.pack()
+
+    def createLabel(self, newText):
+        textVar = StringVar(newText)
+        label = Label(self.root, text = textVar)
+        label.pack()
+        return
+
+    def onExit(self):
+        self.root.quit()
+
+    class FileBrowser:
+        labelText = None
+        label = None
+        button = None
+        currentDirectory = "None"
+        root = None
+
+        def __init__(self, root):
+            self.root = root
+            self.labelText = tk.StringVar()
+            self.label  = tk.Label (root, text = self.labelText.get())
+            self.button = tk.Button(root, text = "Browse", command = self.buttonCallback)
+            self.label.pack()
+            self.button.pack()
+
+        def buttonCallback(self):
+            self.currentDirectory = tk.filedialog.askdirectory()
+            self.labelText.set(self.currentDirectory)
+            self.label = tk.Label (self.root, text = self.labelText.get())
+
+
 main()
