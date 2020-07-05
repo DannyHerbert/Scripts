@@ -10,11 +10,11 @@ def main():
     
     print(gui.deleteUnsortableFiles.get())
     print(gui.keepLeftRight.get())
-    print(gui.currentDirectory.get())
+    print(gui.fileBrowser.currentDirectory)
 
     deleteUnsortableFiles = gui.deleteUnsortableFiles.get()
     keepLeftRight = gui.keepLeftRight.get()
-    CurrentDir = gui.currentDirectory.get()
+    CurrentDir = gui.fileBrowser.currentDirectory
 
 
     for root, dirs, files in os.walk(CurrentDir):
@@ -33,6 +33,8 @@ def main():
                 name = reg.group(1)
             except AttributeError:
                 if deleteUnsortableFiles:
+                    print("Deleting File..")
+                    print("")
                     os.remove(os.path.join(root, currentFile))
                     continue
                 else:
@@ -88,17 +90,21 @@ class Gui:
     root = None
     deleteUnsortableFiles = None
     keepLeftRight = None
-    FileBrowser = None
+    fileBrowser = None
 
     def __init__(self):
         self.root = tk.Tk()
+        self.root.title("Rename Pro Tools Files")
+        self.root.geometry("300x150")
+
+
         self.deleteUnsortableFiles = tk.IntVar()
         self.keepLeftRight = tk.IntVar()
         self.currentDirectory = tk.StringVar()
 
-        self.createCheckBox("Delete hidden//unused Files?", self.deleteUnsortableFiles)
+        self.createCheckBox("Delete hidden/unused Files?", self.deleteUnsortableFiles)
         self.createCheckBox("Keep L and R?", self.keepLeftRight)
-        self.FileBrowser = self.createFileBrowser()
+        self.fileBrowser = self.createFileBrowser()
         self.createButton("Done" , self.onExit)
 
         self.root.mainloop()
@@ -117,16 +123,11 @@ class Gui:
         button = tk.Button(self.root, text = name, command = callback)
         button.pack()
 
-    def createLabel(self, newText):
-        textVar = StringVar(newText)
-        label = Label(self.root, text = textVar)
-        label.pack()
-        return
-
     def onExit(self):
         self.root.quit()
 
     class FileBrowser:
+        frame = None
         labelText = None
         label = None
         button = None
@@ -136,15 +137,18 @@ class Gui:
         def __init__(self, root):
             self.root = root
             self.labelText = tk.StringVar()
-            self.label  = tk.Label (root, text = self.labelText.get())
-            self.button = tk.Button(root, text = "Browse", command = self.buttonCallback)
-            self.label.pack()
-            self.button.pack()
+            self.labelText.set("None")
+            self.frame = tk.LabelFrame(root, text = "Directory to Sort:")
+            self.label  = tk.Label (self.frame, textvariable = self.labelText, bg = "white")
+            self.label.config(width = 20)
+            self.button = tk.Button(self.frame, text = "Browse", command = self.buttonCallback)
+            self.label.grid(row = 0, column = 0)
+            self.button.grid(row = 0, column = 1)
+            self.frame.pack()
 
         def buttonCallback(self):
             self.currentDirectory = tk.filedialog.askdirectory()
             self.labelText.set(self.currentDirectory)
-            self.label = tk.Label (self.root, text = self.labelText.get())
 
 
 main()
