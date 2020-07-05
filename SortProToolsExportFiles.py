@@ -17,7 +17,11 @@ def main():
 
             reg = re.search(r"(^[^.^\-^_?]+)([._-])?(.+)?(\.\w{3})", currentFile)
 
-            name = reg.group(1)
+            try:
+                name = reg.group(1)
+            except AttributeError:
+                continue
+                    
             seperator = reg.group(2)
             rubbish  = reg.group(3)
             filetype = reg.group(4)
