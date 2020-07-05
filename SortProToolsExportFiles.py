@@ -3,8 +3,12 @@ import Helpers
 import os
 
 
+
 def main():
     CurrentDir = Helpers.askFileDirectory()
+    
+    deleteOtherFiles = Helpers.createCheckBox("Delete Other Files?")
+
 
     for root, dirs, files in os.walk(CurrentDir):
         for currentFile in files:
@@ -17,24 +21,38 @@ def main():
 
             reg = re.search(r"(^[^.^\-^_?]+)([._-])?(.+)?(\.\w{3})", currentFile)
 
-            name = reg.group(1)
+            # Name of file
+            try:
+                name = reg.group(1)
+            except AttributeError:
+                if deleteOtherFiles:
+                    os.remove(os.path.join(root, currentFile))
+                    continue
+                else:
+                    continue
+
+            # Seperator (- , . etc)
             seperator = reg.group(2)
+
+            # All the dup2 bits
             rubbish  = reg.group(3)
+
+            # Filetype
             filetype = reg.group(4)
-            suffix = ''
 
             if seperator is None:
                 print("File name is already fine...")
                 print("")
                 continue
 
+            suffix = ''
             if rubbish is not None:
                 # find any l or r character thats not in a word of word a-z characters
                 panning = re.search(r"(^|[^a-z^A-Z])([lLrR])([^a-z^A-Z]|$)", rubbish)
                 if panning is not None:
                     suffix += " " + panning.group(2)
 
-            name = os.path.split(renameFileAndIterateForDuplicates(os.path.join(CurrentDir, currentFile),os.path.join(CurrentDir, name + suffix + filetype)))[1]
+            name = os.path.split(renameFileAndIterateForDuplicates(os.path.join(root, currentFile),os.path.join(root, name + suffix + filetype)))[1]
 
             print("New Name:  " + name)
             print("Discared:  " + rubbish)
